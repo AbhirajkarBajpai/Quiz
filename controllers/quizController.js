@@ -3,7 +3,7 @@ const Attempt = require("../models/Attempts");
 const Question = require("../models/Questions");
 const { validationResult } = require("express-validator");
 
-// 📌 Create a new quiz
+
 exports.createQuiz = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -22,7 +22,6 @@ exports.createQuiz = async (req, res) => {
   }
 };
 
-// 📌 Get all quizzes
 exports.getAllQuizzes = async (req, res) => {
   try {
     const quizzes = await Quiz.find();
@@ -32,7 +31,7 @@ exports.getAllQuizzes = async (req, res) => {
   }
 };
 
-// 📌 Add questions to a quiz
+
 exports.addQuestions = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -54,7 +53,7 @@ exports.addQuestions = async (req, res) => {
 };
 
 
-// 📌 Fetch participants of a quiz
+
 exports.getParticipants = async (req, res) => {
   try {
     const participants = await Attempt.find({ quizId: req.params.id }).populate("userId", "name email");
@@ -64,7 +63,6 @@ exports.getParticipants = async (req, res) => {
   }
 };
 
-// 📌 Get responses of a specific user for a quiz
 exports.getUserResponse = async (req, res) => {
   try {
     const response = await Attempt.findOne({ quizId: req.params.id, userId: req.params.userId });
@@ -76,7 +74,7 @@ exports.getUserResponse = async (req, res) => {
   }
 };
 
-// 📌 Fetch quizzes assigned to the user
+
 exports.getMyQuizzes = async (req, res) => {
   try {
     let attempts = await Attempt.find({ userId: req.user.id }).populate("quizId");
@@ -114,7 +112,6 @@ exports.getMyQuizzes = async (req, res) => {
 };
 
 
-// 📌 Start a quiz
 exports.startQuiz = async (req, res) => {
   try {
     let attempt = await Attempt.findOne({ quizId: req.params.id, userId: req.user.id });
@@ -216,7 +213,6 @@ exports.submitQuiz = async (req, res) => {
 };
 
 
-// 📌 Fetch user’s quiz results
 exports.getQuizResponse = async (req, res) => {
   try {
     const attempt = await Attempt.findOne({ quizId: req.params.id, userId: req.user.id });
