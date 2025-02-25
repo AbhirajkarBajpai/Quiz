@@ -11,10 +11,10 @@ require("dotenv").config();
 const app = express();
 
 app.use(authLimiter);
-
 app.set("trust proxy", true);
 
 const PORT = process.env.PORT || 3000;
+
 app.use(helmet());
 app.use(
   cors({
@@ -35,12 +35,16 @@ app.get("/", (req, res) => {
   res.send("Hello, Express!");
 });
 
-// mongoose
-//   .connect(
-//     `mongodb+srv://21it3001:${process.env.MongoPass}@cluster0.dphm3.mongodb.net/`
-//   )
-//   .then(() => console.log("MongoDB connected"))
-//   .catch((err) => console.error("MongoDB connection error:", err));
+app.get("/health", (req, res) => {
+  res.send("Everything is Fine Here!");
+});
+
+mongoose
+  .connect(
+    `mongodb+srv://abhiraj:${process.env.MongoPass}@cluster0.0c9jl.mongodb.net/`
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

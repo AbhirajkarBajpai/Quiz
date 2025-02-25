@@ -1,14 +1,23 @@
 const express = require("express");
 const { body } = require("express-validator");
 const quizController = require("../controllers/quizController");
-const { protect } = require("../controllers/authController");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+router.use(authController.protect); 
+
+//User Routes
+router.get("/my-quizzes",  quizController.getMyQuizzes);
+router.post("/quizzes/:id/start",  quizController.startQuiz);
+router.post("/quizzes/:id/submit",  quizController.submitQuiz);
+router.get("/quizzes/:id/response",  quizController.getQuizResponse);
+
+
 //Admin Routes
+router.use(authController.restrictTo("admin"));
 router.post(
   "/quizzes",
-  protect,
   [
     body("title").notEmpty().withMessage("Title is required"),
     body("totalQuestions").isInt({ min: 1 }).withMessage("Total questions must be at least 1"),
@@ -18,10 +27,9 @@ router.post(
   quizController.createQuiz
 );
 
-router.get("/quizzes", protect, quizController.getAllQuizzes);
+router.get("/quizzes", quizController.getAllQuizzes);
 router.post(
   "/quizzes/:id/questions",
-  protect,
   [
     body("questionText").notEmpty().withMessage("Question text is required"),
     body("marks").isInt({ min: 1 }).withMessage("Marks must be at least 1"),
@@ -29,13 +37,7 @@ router.post(
   ],
   quizController.addQuestion
 );
-router.get("/quizzes/:id/participants", protect, quizController.getParticipants);
-router.get("/quizzes/:id/response/:userId", protect, quizController.getUserResponse);
-
-//User Routes
-router.get("/my-quizzes", protect, quizController.getMyQuizzes);
-router.post("/quizzes/:id/start", protect, quizController.startQuiz);
-router.post("/quizzes/:id/submit", protect, quizController.submitQuiz);
-router.get("/quizzes/:id/response", protect, quizController.getQuizResponse);
+router.get("/quizzes/:id/participants", quizController.getParticipants);
+router.get("/quizzes/:id/response/:userId", quizController.getUserResponse);
 
 module.exports = router;
