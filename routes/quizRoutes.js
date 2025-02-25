@@ -10,6 +10,7 @@ router.use(authController.protect);
 //User Routes
 router.get("/my-quizzes",  quizController.getMyQuizzes);
 router.post("/quizzes/:id/start",  quizController.startQuiz);
+router.post("/quizzes/:quizId/question/:questionId/submit", authController.protect, quizController.submitQuestion);
 router.post("/quizzes/:id/submit",  quizController.submitQuiz);
 router.get("/quizzes/:id/response",  quizController.getQuizResponse);
 
@@ -31,12 +32,16 @@ router.get("/quizzes", quizController.getAllQuizzes);
 router.post(
   "/quizzes/:id/questions",
   [
-    body("questionText").notEmpty().withMessage("Question text is required"),
-    body("marks").isInt({ min: 1 }).withMessage("Marks must be at least 1"),
-    body("options").isArray({ min: 2 }).withMessage("At least 2 options are required"),
+    body("questions").isArray({ min: 1, max: 10 }).withMessage("You can add 1 to 10 questions at a time"),
+    body("questions.*.questionText").notEmpty().withMessage("Each question must have text"),
+    body("questions.*.marks").isInt({ min: 1 }).withMessage("Each question must have marks"),
+    body("questions.*.options").isArray({ min: 2 }).withMessage("Each question must have at least 2 options"),
+    body("questions.*.options.*.optionText").notEmpty().withMessage("Each option must have text"),
+    body("questions.*.options.*.isCorrect").isBoolean().withMessage("Each option must specify if it is correct"),
   ],
-  quizController.addQuestion
+  quizController.addQuestions
 );
+
 router.get("/quizzes/:id/participants", quizController.getParticipants);
 router.get("/quizzes/:id/response/:userId", quizController.getUserResponse);
 
