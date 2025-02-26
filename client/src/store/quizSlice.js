@@ -1,11 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 
-// ✅ Async action to fetch quizzes from backend
-export const fetchQuizzes = createAsyncThunk("quiz/fetchQuizzes", async () => {
-  const response = await fetch("/api/quizzes");
-  return await response.json();
-});
+export const fetchQuizzes = createAsyncThunk(
+  "quiz/fetchQuizzes",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/quiz/quizzes");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch quizzes");
+    }
+  }
+);
 
 // Async thunk to create a quiz
 export const createQuiz = createAsyncThunk(
@@ -69,6 +75,19 @@ const quizSlice = createSlice({
         state.loading = false;
       })
       .addCase(addQuizQuestions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(fetchQuizzes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuizzes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.quizzes = Array.isArray(action.payload.quizzes) ? action.payload.quizzes : [];
+      })      
+      .addCase(fetchQuizzes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
