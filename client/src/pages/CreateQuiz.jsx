@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import "./CreateQuiz.css"; // Import CSS file
+import { useDispatch, useSelector } from "react-redux";
+import { createQuiz } from "../store/quizSlice";
+import { useNavigate } from "react-router-dom";
+import "./CreateQuiz.css";
 
-const CreateQuiz = ({ onNext }) => {
+const CreateQuiz = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.quiz);
+
   const [quizDetails, setQuizDetails] = useState({
     title: "",
-    numQuestions: "",
-    score: "",
+    totalQuestions: "",
+    totalScore: "",
     duration: "",
   });
 
@@ -13,13 +20,22 @@ const CreateQuiz = ({ onNext }) => {
     setQuizDetails({ ...quizDetails, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!quizDetails.title || !quizDetails.numQuestions || !quizDetails.score || !quizDetails.duration) {
+    if (!quizDetails.title || !quizDetails.totalQuestions || !quizDetails.totalScore || !quizDetails.duration) {
       alert("Please fill in all fields.");
       return;
     }
-    onNext(quizDetails); // Proceed to next step
+
+    try {
+      const resultAction = await dispatch(createQuiz(quizDetails));
+      console.log("act", resultAction);
+      if (createQuiz.fulfilled.match(resultAction)) {
+        navigate(`/admin/add-questions/${resultAction.payload.quiz._id}`);
+      }
+    } catch (error) {
+      console.error("Quiz creation failed", error);
+    }
   };
 
   return (
@@ -30,15 +46,15 @@ const CreateQuiz = ({ onNext }) => {
         <input type="text" name="title" value={quizDetails.title} onChange={handleChange} />
 
         <label>Number of Questions:</label>
-        <input type="number" name="numQuestions" value={quizDetails.numQuestions} onChange={handleChange} min="1" max="10" />
+        <input type="number" name="totalQuestions" value={quizDetails.totalQuestions} onChange={handleChange} min="1" max="10" />
 
         <label>Enter Score:</label>
-        <input type="number" name="score" value={quizDetails.score} onChange={handleChange} min="1" />
+        <input type="number" name="totalScore" value={quizDetails.totalScore} onChange={handleChange} min="1" />
 
         <label>Enter Duration (in minutes):</label>
         <input type="number" name="duration" value={quizDetails.duration} onChange={handleChange} min="1" />
 
-        <button type="submit">Next</button>
+        <button type="submit" disabled={loading}>{loading ? "Creating..." : "Next"}</button>
       </form>
     </div>
   );

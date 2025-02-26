@@ -25,6 +25,7 @@ const AdminDashboard = () => {
       </button>
       {loading && <p>Loading quizzes...</p>}
       {error && <p className="error">{error}</p>}
+      {!loading && !error && quizzes.length === 0 && <p>No quizzes available. Create some!</p>}
       <div className="quiz-list">
         {quizzes.map((quiz) => (
           <div key={quiz._id} className="quiz-item" onClick={() => handleQuizClick(quiz._id)}>

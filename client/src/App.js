@@ -5,6 +5,8 @@ import { checkLoginStatus } from "./store/authSlice";
 import Login from "./components/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
+import CreateQuiz from "./pages/CreateQuiz";
+import AddQuestions from "./pages/AddQuestions";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -21,6 +23,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={user ? <Navigate to={user.role === "admin" ? "/admin-dashboard" : "/user-dashboard"} /> : <Login />} />
         <Route path="/admin-dashboard" element={user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" />} />
+        <Route path="/admin/create-quiz" element={user?.role === "admin" ? <CreateQuiz /> : <Navigate to="/" />} />
+        <Route path="/admin/add-questions/:quizId" element={user?.role === "admin" ? <AddQuestions /> : <Navigate to="/" />} />
         <Route path="/user-dashboard" element={user?.role === "user" ? <UserDashboard /> : <Navigate to="/" />} />
       </Routes>
     </Router>
