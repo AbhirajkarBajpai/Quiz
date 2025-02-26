@@ -11,15 +11,15 @@ require("dotenv").config();
 const app = express();
 
 app.use(authLimiter);
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 app.use(
   cors({
+    origin: "http://localhost:3000",
     credentials: true,
-    origin: ["http://localhost:3000", "https://contri-frontend.vercel.app"],
   })
 );
 
@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app.use("/api", quizRoutes);
+app.use("/api/quiz", quizRoutes);
 
 
 app.get("/", (req, res) => {
